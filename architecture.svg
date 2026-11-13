@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="567" viewBox="0 0 660 567" role="img" aria-labelledby="title description">
+  <title id="title">Multichannel Release Orchestrator</title>
+  <desc id="description">A human approves the digested release manifest. Channel jobs are claimed separately and checked against provider readback. Verified jobs complete independently. Other outcomes are held or retried according to readback.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#282828"/>
+    </marker>
+  </defs>
+  <rect width="660" height="567" fill="#fff"/>
+  <g font-family="system-ui, sans-serif" font-size="17" fill="#161616">
+    <rect x="20" y="18" width="419" height="534" rx="10" fill="#fafafa" stroke="#282828" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="36" y="45" text-anchor="start" font-size="15">Offline release orchestrator</text>
+<rect x="71" y="62" width="248" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<rect x="76" y="67" width="238" height="34" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195.0" y="90" text-anchor="middle" font-size="17">Review release manifest</text>
+<rect x="460" y="62" width="180" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="550.0" y="90" text-anchor="middle" font-size="17">Synthetic release</text>
+<path d="M460 84H320" fill="none" stroke="#282828" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<path d="M195 106V122" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M195 123l130 38-130 38-130-38Z" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195" y="167" text-anchor="middle" font-size="17">Approved?</text>
+<path d="M325 161H373V218" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="351" y="151" text-anchor="middle" font-size="14">No</text>
+<rect x="321" y="219" width="104" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="373.0" y="247" text-anchor="middle" font-size="17">Hold</text>
+<path d="M195 199V219" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="209" y="214" text-anchor="start" font-size="14">Yes</text>
+<rect x="71" y="220" width="248" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195.0" y="248" text-anchor="middle" font-size="17">Queue channel jobs</text>
+<path d="M195 264V280" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="71" y="281" width="248" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195.0" y="309" text-anchor="middle" font-size="17">Record delivery attempt</text>
+<path d="M195 325V341" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="71" y="342" width="248" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195.0" y="370" text-anchor="middle" font-size="17">Check delivery</text>
+<rect x="460" y="342" width="180" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="550.0" y="370" text-anchor="middle" font-size="17">Mock channels</text>
+<path d="M319 355H459" fill="none" stroke="#282828" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<path d="M460 374H320" fill="none" stroke="#282828" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<path d="M195 386V398" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M195 399l130 38-130 38-130-38Z" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195" y="443" text-anchor="middle" font-size="17">Readback matches?</text>
+<path d="M195 475V493" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="207" y="489" text-anchor="start" font-size="13">Yes</text>
+<rect x="71" y="494" width="248" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="195.0" y="522" text-anchor="middle" font-size="17">Verify channel</text>
+<path d="M325 437H371V473" fill="none" stroke="#282828" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="349" y="428" text-anchor="middle" font-size="14">No</text>
+<rect x="320" y="474" width="107" height="44" rx="10" fill="#fff" stroke="#282828" stroke-width="1.4"/>
+<text x="373.5" y="502" text-anchor="middle" font-size="17">Hold or retry</text>
+  </g>
+</svg>
