@@ -47,3 +47,23 @@ class ReleaseTest(unittest.TestCase):
         state = self.release.run("sample", self.provider)
         self.assertEqual(state["channels"]["shop"]["state"], "conflict")
         self.assertFalse(state["complete"])
+
+    def test_completed_receipt_rejects_replacement_provider(self):
+        self.release.approve("sample", PAYLOADS, "test", DIGEST)
+        self.assertTrue(self.release.run("sample", self.provider)["complete"])
+        substitute = MockChannels(self.provider.path.with_name("replacement.sqlite"))
+        with self.assertRaisesRegex(ValueError, "another provider"):
+            self.release.run("sample", substitute)
+        self.assertTrue(Release(self.release.path).run("sample", MockChannels(self.provider.path))["complete"])
+
+    def test_unknown_pre_write_interruption_stays_held_after_restart(self):
+        class Ambiguous(MockChannels):
+            def send(self, key, body, fault=None):
+                raise ConnectionError("Synthetic interruption before write")
+
+        self.release.approve("sample", PAYLOADS, "test", DIGEST)
+        self.release.run("sample", Ambiguous(self.provider.path))
+        result = Release(self.release.path).run("sample", self.provider)
+        self.assertFalse(result["complete"])
+        for record in result["channels"].values():
+            self.assertEqual(record, {"state": "attempting", "attempts": 1})
