@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sqlite3
+from uuid import uuid4
 
 
 def freeze(payload):
@@ -15,6 +16,16 @@ class MockChannels:
         self.path = path
         with closing(sqlite3.connect(path)) as db, db:
             db.execute("CREATE TABLE IF NOT EXISTS delivered (key TEXT PRIMARY KEY, body TEXT)")
+            db.execute("CREATE TABLE IF NOT EXISTS identity (singleton INTEGER PRIMARY KEY, value TEXT NOT NULL)")
+            db.execute("INSERT OR IGNORE INTO identity VALUES (1, ?)", (uuid4().hex,))
+
+    @property
+    def identity(self):
+        with closing(sqlite3.connect(self.path)) as db:
+            row = db.execute("SELECT value FROM identity WHERE singleton = 1").fetchone()
+        if row is None:
+            raise ValueError("Missing destination identity")
+        return row[0]
 
     def send(self, key, body, fault=None):
         if fault == "unavailable":
@@ -35,6 +46,7 @@ class Release:
         self.path = path
         with closing(sqlite3.connect(path)) as db, db:
             db.execute("CREATE TABLE IF NOT EXISTS releases (id TEXT PRIMARY KEY, manifest TEXT, reviewer TEXT)")
+            db.execute("CREATE TABLE IF NOT EXISTS destinations (release TEXT PRIMARY KEY, provider_id TEXT NOT NULL)")
             db.execute("""CREATE TABLE IF NOT EXISTS jobs (
                 release TEXT, channel TEXT, body TEXT, state TEXT, attempts INTEGER,
                 PRIMARY KEY(release, channel)
@@ -55,11 +67,20 @@ class Release:
 
     def run(self, release_id, provider, faults=None):
         faults = faults or {}
-        with closing(sqlite3.connect(self.path)) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
+            db.execute("BEGIN IMMEDIATE")
             jobs = db.execute("SELECT channel, body FROM jobs WHERE release = ? ORDER BY channel",
                               (release_id,)).fetchall()
-        if not jobs:
-            raise ValueError("Expected an approved release")
+            if not jobs:
+                raise ValueError("Expected an approved release")
+            destination = db.execute("SELECT provider_id FROM destinations WHERE release = ?", (release_id,)).fetchone()
+            if destination is None:
+                prior = db.execute("SELECT 1 FROM jobs WHERE release = ? AND attempts > 0", (release_id,)).fetchone()
+                if prior:
+                    raise ValueError("Existing attempts have no recorded provider")
+                db.execute("INSERT INTO destinations VALUES (?, ?)", (release_id, provider.identity))
+            elif destination[0] != provider.identity:
+                raise ValueError("Release is bound to another provider")
         for channel, body in jobs:
             key = sha256(freeze([release_id, channel, body]).encode()).hexdigest()
             with closing(sqlite3.connect(self.path)) as db, db:
@@ -71,10 +92,10 @@ class Release:
                     provider.send(key, body, faults.get(channel))
                 except ConnectionError:
                     continue
-            self.verify(release_id, channel, provider, key, body, allow_retry=bool(claimed))
+            self._verify(release_id, channel, provider, key, body, allow_retry=bool(claimed))
         return self.status(release_id)
 
-    def verify(self, release_id, channel, provider, key, expected, *, allow_retry=False):
+    def _verify(self, release_id, channel, provider, key, expected, *, allow_retry=False):
         actual = provider.read(key)
         if actual is None and not allow_retry:
             return
